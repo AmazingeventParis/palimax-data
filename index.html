@@ -116,6 +116,8 @@ function doLogout() {
 function showApp() {
     document.getElementById('loginWrap').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    document.getElementById('dateFrom').value = '2025-04-01';
+    document.getElementById('dateTo').value = new Date().toISOString().slice(0, 10);
     loadData();
 }
 
