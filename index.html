@@ -64,7 +64,7 @@ tr:hover td{background:#fafafa}
 <div class="login-wrap" id="loginWrap">
 <div class="login">
     <h1>Palimax Data</h1>
-    <p>Donnees de vos bornes photo</p>
+    <p>Données de vos bornes photo</p>
     <div class="err" id="loginErr">Mot de passe incorrect</div>
     <input type="password" id="loginPass" placeholder="Mot de passe" autofocus onkeydown="if(event.key==='Enter')doLogin()">
     <button onclick="doLogin()">Connexion</button>
@@ -74,7 +74,7 @@ tr:hover td{background:#fafafa}
 <div class="app" id="app">
 <div class="header">
     <h1>&#x1F4CA; <span>Palimax</span> — Data Bornes</h1>
-    <span class="logout" onclick="doLogout()">Deconnexion</span>
+    <span class="logout" onclick="doLogout()">Déconnexion</span>
 </div>
 
 <div class="filters">
@@ -151,7 +151,7 @@ function render(data) {
 
     // Stats
     html += '<div class="stats">';
-    html += statCard(s.total, 'Total entrees');
+    html += statCard(s.total, 'Total entrées');
     html += statCard(s.uniques, 'Contacts uniques');
     html += statCard(s.sms, 'SMS');
     html += statCard(s.emails, 'Emails');
@@ -166,7 +166,7 @@ function render(data) {
 
     // Borne cards
     var sorted = data.bornes_stats.slice().sort(function(a, b) { return b.total - a.total; });
-    html += '<h2 style="margin-bottom:12px">Detail par borne</h2>';
+    html += '<h2 style="margin-bottom:12px">Détail par borne</h2>';
     sorted.forEach(function(b) {
         var det = data.details[b.id] || [];
         var exFrom = document.getElementById('dateFrom').value;
@@ -182,7 +182,7 @@ function render(data) {
         if (det.length > 0) {
             html += '<div class="borne-detail" style="display:none;margin-top:10px">';
             html += '<input type="text" class="search-input" placeholder="Rechercher..." oninput="searchTable(this)">';
-            html += '<table><thead><tr><th>1ere visite</th><th>Type</th><th>Data</th><th>Passages</th><th>RGPD</th></tr></thead><tbody>';
+            html += '<table><thead><tr><th>1ère visite</th><th>Type</th><th>Data</th><th>Passages</th><th>RGPD</th></tr></thead><tbody>';
             det.forEach(function(row) {
                 var typeBadge = row.type === 2 ? '<span class="badge badge-sms">SMS</span>' : '<span class="badge badge-email">Email</span>';
                 var rgpdBadge = row.rgpd === 1 ? '<span class="badge badge-oui">Oui</span>' : '<span class="badge badge-non">Non</span>';
@@ -250,7 +250,7 @@ function downloadExport() {
     var borne = document.getElementById('borneFilter').value;
     var from = document.getElementById('dateFrom').value;
     var to = document.getElementById('dateTo').value;
-    var headers = ['Magasin', 'Type', 'Data', 'Passages', 'RGPD', '1ere visite'];
+    var headers = ['Magasin', 'Type', 'Data', 'Passages', 'RGPD', '1ère visite'];
 
     function detailRows(borneId) {
         var name = lastData.bornes[borneId] || ('Borne ' + borneId);
