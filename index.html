@@ -161,8 +161,8 @@ function render(data) {
     html += '</div>';
 
     // Charts
-    html += '<div class="charts-row"><div class="chart-card"><h2>Evolution par semaine</h2><canvas id="weekChart" height="200"></canvas></div>';
-    html += '<div class="chart-card"><h2>Jour le plus actif</h2><canvas id="dayChart" height="200"></canvas></div></div>';
+    html += '<div class="charts-row"><div class="chart-card"><h2>Tendance</h2><canvas id="weekChart" height="200"></canvas></div>';
+    html += '<div class="chart-card"><h2>Fréquentation</h2><canvas id="dayChart" height="200"></canvas></div></div>';
 
     // Borne cards
     var sorted = data.bornes_stats.slice().sort(function(a, b) { return b.total - a.total; });
