@@ -41,7 +41,8 @@ select:focus{outline:none;border-color:#e94560}
 .rank-name{flex:1;color:#333}
 .rank-bar{height:8px;background:#e94560;border-radius:4px;min-width:4px}
 .rank-num{font-weight:700;color:#666;font-size:12px;width:40px;text-align:right}
-.borne-card{background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:8px;border:1px solid #e0e0e0}
+.borne-card{background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:8px;border:1px solid #e0e0e0;cursor:pointer;transition:background 0.15s,border-color 0.15s}
+.borne-card:hover{background:#fafafa;border-color:#e94560}
 .borne-header{display:flex;align-items:center;gap:8px}
 .borne-title{font-size:14px;font-weight:700;color:#222}
 .borne-id{font-size:11px;color:#aaa}
@@ -177,15 +178,14 @@ function render(data) {
     html += '<h2 style="margin-bottom:12px">Detail par borne</h2>';
     data.bornes_stats.forEach(function(b) {
         var det = data.details[b.id] || [];
-        html += '<div class="borne-card"><div class="borne-header"><div><span class="borne-title">' + b.name + '</span> <span class="borne-id">ID #' + b.id + '</span></div>';
+        var exFrom = document.getElementById('dateFrom').value;
+        var exTo = document.getElementById('dateTo').value;
+        html += '<div class="borne-card" onclick="toggleDetailCard(this)"><div class="borne-header"><div><span class="borne-title">' + b.name + '</span> <span class="borne-id">ID #' + b.id + '</span></div>';
         html += '<div class="borne-stats">';
         html += borneStat(b.uniques, 'Contacts') + borneStat(b.sms, 'SMS') + borneStat(b.emails, 'Emails');
         html += '</div><div class="borne-actions">';
         if (b.total > 0) {
-            var exFrom = document.getElementById('dateFrom').value;
-            var exTo = document.getElementById('dateTo').value;
-            html += '<a class="btn btn-export btn-sm" href="' + API + (exFrom ? '&from=' + exFrom : '') + (exTo ? '&to=' + exTo : '') + '&borne=' + b.id + '&export=xlsx" target="_blank">Excel</a> ';
-            html += '<button class="btn btn-sm" style="background:#2563eb;border-color:#2563eb" onclick="toggleDetail(this)">Detail</button>';
+            html += '<a class="btn btn-export btn-sm" href="' + API + (exFrom ? '&from=' + exFrom : '') + (exTo ? '&to=' + exTo : '') + '&borne=' + b.id + '&export=xlsx" target="_blank" onclick="event.stopPropagation()">Excel</a>';
         }
         html += '</div></div>';
         if (det.length > 0) {
@@ -211,7 +211,7 @@ function render(data) {
 
 function statCard(n, label) { return '<div class="stat-card"><div class="stat-num">' + (parseInt(n) || 0) + '</div><div class="stat-label">' + label + '</div></div>'; }
 function borneStat(n, label) { return '<div class="borne-stat"><div class="num">' + (parseInt(n) || 0) + '</div><div class="lbl">' + label + '</div></div>'; }
-function toggleDetail(btn) { var d = btn.closest('.borne-card').querySelector('.borne-detail'); d.style.display = d.style.display === 'none' ? '' : 'none'; }
+function toggleDetailCard(card) { var d = card.querySelector('.borne-detail'); if (d) d.style.display = d.style.display === 'none' ? '' : 'none'; }
 function searchTable(input) { var v = input.value.toLowerCase(); input.nextElementSibling.querySelectorAll('tbody tr').forEach(function(r) { r.style.display = r.textContent.toLowerCase().indexOf(v) >= 0 ? '' : 'none'; }); }
 
 function renderCharts(data) {
