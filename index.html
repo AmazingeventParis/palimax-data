@@ -181,7 +181,12 @@ function render(data) {
         html += '<div class="borne-stats">';
         html += borneStat(b.uniques, 'Contacts') + borneStat(b.sms, 'SMS') + borneStat(b.emails, 'Emails');
         html += '</div><div class="borne-actions">';
-        if (det.length > 0) html += '<button class="btn btn-sm" style="background:#2563eb;border-color:#2563eb" onclick="toggleDetail(this)">Detail</button>';
+        if (b.total > 0) {
+            var exFrom = document.getElementById('dateFrom').value;
+            var exTo = document.getElementById('dateTo').value;
+            html += '<a class="btn btn-export btn-sm" href="' + API + (exFrom ? '&from=' + exFrom : '') + (exTo ? '&to=' + exTo : '') + '&borne=' + b.id + '&export=xlsx" target="_blank">Excel</a> ';
+            html += '<button class="btn btn-sm" style="background:#2563eb;border-color:#2563eb" onclick="toggleDetail(this)">Detail</button>';
+        }
         html += '</div></div>';
         if (det.length > 0) {
             html += '<div class="borne-detail" style="display:none;margin-top:10px">';
