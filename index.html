@@ -34,13 +34,6 @@ select:focus{outline:none;border-color:#e94560}
 .stat-label{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:1px}
 .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
 .chart-card{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e0e0}
-.ranking{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e0e0;margin-bottom:20px}
-.rank-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px}
-.rank-row:last-child{border:none}
-.rank-pos{font-weight:800;color:#e94560;width:24px;text-align:center;font-size:14px}
-.rank-name{flex:1;color:#333}
-.rank-bar{height:8px;background:#e94560;border-radius:4px;min-width:4px}
-.rank-num{font-weight:700;color:#666;font-size:12px;width:40px;text-align:right}
 .borne-card{background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:8px;border:1px solid #e0e0e0;cursor:pointer;transition:background 0.15s,border-color 0.15s}
 .borne-card:hover{background:#fafafa;border-color:#e94560}
 .borne-header{display:flex;align-items:center;gap:8px}
@@ -165,18 +158,10 @@ function render(data) {
     html += '<div class="charts-row"><div class="chart-card"><h2>Evolution par semaine</h2><canvas id="weekChart" height="200"></canvas></div>';
     html += '<div class="chart-card"><h2>Jour le plus actif</h2><canvas id="dayChart" height="200"></canvas></div></div>';
 
-    // Ranking
-    var sorted = data.bornes_stats.slice().sort(function(a, b) { return b.uniques - a.uniques; });
-    var maxR = sorted[0] ? sorted[0].uniques : 1;
-    html += '<div class="ranking"><h2>Classement des bornes</h2>';
-    sorted.forEach(function(b, i) {
-        html += '<div class="rank-row"><div class="rank-pos">' + (i + 1) + '</div><div class="rank-name">' + b.name + '</div><div style="flex:1;max-width:200px"><div class="rank-bar" style="width:' + Math.round(b.uniques / maxR * 100) + '%"></div></div><div class="rank-num">' + b.uniques + '</div></div>';
-    });
-    html += '</div>';
-
     // Borne cards
+    var sorted = data.bornes_stats.slice().sort(function(a, b) { return b.total - a.total; });
     html += '<h2 style="margin-bottom:12px">Detail par borne</h2>';
-    data.bornes_stats.forEach(function(b) {
+    sorted.forEach(function(b) {
         var det = data.details[b.id] || [];
         var exFrom = document.getElementById('dateFrom').value;
         var exTo = document.getElementById('dateTo').value;
