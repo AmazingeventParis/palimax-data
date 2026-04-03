@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Palimax - Data Bornes</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f5f5f5;color:#333;padding:20px;max-width:1200px;margin:0 auto}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:80vh}
+.login{background:#fff;padding:40px;border-radius:16px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.08);border:1px solid #e0e0e0;width:320px}
+.login h1{font-size:22px;margin-bottom:8px;color:#222}
+.login p{color:#888;margin-bottom:24px;font-size:14px}
+.login input{width:100%;padding:12px 16px;border:1px solid #ccc;border-radius:8px;background:#f9f9f9;color:#333;font-size:16px;margin-bottom:16px}
+.login input:focus{outline:none;border-color:#e94560}
+.login button{width:100%;padding:12px;background:#e94560;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:700;cursor:pointer}
+.login button:hover{background:#c73b52}
+.login .err{color:#e94560;margin-bottom:12px;font-size:13px;display:none}
+.app{display:none}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+h1{font-size:22px;color:#222}h1 span{color:#e94560}
+h2{font-size:16px;color:#222;margin-bottom:12px}
+.logout{color:#999;text-decoration:none;font-size:13px;cursor:pointer}.logout:hover{color:#e94560}
+.filters{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+select{padding:8px 14px;border:1px solid #ccc;border-radius:6px;background:#fff;color:#333;font-size:13px;cursor:pointer}
+select:focus{outline:none;border-color:#e94560}
+.btn{background:#e94560;border:1px solid #e94560;font-weight:700;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:6px;font-size:13px;cursor:pointer}
+.btn:hover{background:#c73b52}
+.btn-export{background:#16a34a;border-color:#16a34a}.btn-export:hover{background:#15803d}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:10px;padding:14px;text-align:center;border:1px solid #e0e0e0}
+.stat-num{font-size:26px;font-weight:800;color:#e94560;margin-bottom:2px}
+.stat-label{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:1px}
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+.chart-card{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e0e0}
+.ranking{background:#fff;border-radius:10px;padding:16px;border:1px solid #e0e0e0;margin-bottom:20px}
+.rank-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px}
+.rank-row:last-child{border:none}
+.rank-pos{font-weight:800;color:#e94560;width:24px;text-align:center;font-size:14px}
+.rank-name{flex:1;color:#333}
+.rank-bar{height:8px;background:#e94560;border-radius:4px;min-width:4px}
+.rank-num{font-weight:700;color:#666;font-size:12px;width:40px;text-align:right}
+.borne-card{background:#fff;border-radius:10px;padding:14px 18px;margin-bottom:8px;border:1px solid #e0e0e0}
+.borne-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.borne-title{font-size:14px;font-weight:700;color:#222}
+.borne-id{font-size:11px;color:#aaa}
+.borne-stats{display:flex;gap:16px;flex-wrap:wrap}
+.borne-stat{text-align:center}.borne-stat .num{font-size:16px;font-weight:800;color:#e94560}.borne-stat .lbl{font-size:10px;color:#999}
+.borne-actions{display:flex;gap:6px;align-items:center}
+.btn-sm{padding:4px 10px;font-size:11px;border-radius:4px}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+th{background:#f7f7f7;padding:6px 8px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;position:sticky;top:0}
+td{padding:5px 8px;border-bottom:1px solid #f0f0f0}
+tr:hover td{background:#fafafa}
+.badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700}
+.badge-sms{background:rgba(37,99,235,0.1);color:#2563eb}.badge-email{background:rgba(22,163,74,0.1);color:#16a34a}
+.badge-oui{background:rgba(22,163,74,0.1);color:#16a34a}.badge-non{background:rgba(220,38,38,0.1);color:#dc2626}
+.search-input{padding:6px 10px;border:1px solid #ddd;border-radius:5px;font-size:12px;width:200px;margin-bottom:6px}
+.loading{text-align:center;padding:40px;color:#999}
+@media(max-width:768px){.charts-row{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:500px){.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="login-wrap" id="loginWrap">
+<div class="login">
+    <h1>Palimax Data</h1>
+    <p>Donnees de vos bornes photo</p>
+    <div class="err" id="loginErr">Mot de passe incorrect</div>
+    <input type="password" id="loginPass" placeholder="Mot de passe" autofocus onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">Connexion</button>
+</div>
+</div>
+
+<div class="app" id="app">
+<div class="header">
+    <h1>&#x1F4CA; <span>Palimax</span> — Data Bornes</h1>
+    <span class="logout" onclick="doLogout()">Deconnexion</span>
+</div>
+
+<div class="filters">
+    <label style="font-size:12px;color:#888">Du</label>
+    <input type="date" id="dateFrom" style="padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:13px" onchange="loadData()">
+    <label style="font-size:12px;color:#888">Au</label>
+    <input type="date" id="dateTo" style="padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:13px" onchange="loadData()">
+    <select id="borneFilter" onchange="loadData()">
+        <option value="0">Toutes les bornes</option>
+    </select>
+</div>
+
+<div id="content"><div class="loading">Chargement...</div></div>
+</div>
+
+<script>
+var API = 'https://shootnbox.fr/manager2/palimax_api.php?token=plx2026snb';
+var COLORS = ['#e94560','#2563eb','#16a34a','#f59e0b','#8b5cf6','#ec4899','#14b8a6','#f97316','#6366f1','#84cc16'];
+var weekChart = null, dayChart = null;
+
+function doLogin() {
+    var pass = document.getElementById('loginPass').value;
+    if (pass === 'Palimax2026') {
+        localStorage.setItem('plx_auth', '1');
+        showApp();
+    } else {
+        document.getElementById('loginErr').style.display = 'block';
+    }
+}
+function doLogout() {
+    localStorage.removeItem('plx_auth');
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginWrap').style.display = 'flex';
+    document.getElementById('loginPass').value = '';
+}
+function showApp() {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadData();
+}
+
+function loadData() {
+    var from = document.getElementById('dateFrom').value;
+    var to = document.getElementById('dateTo').value;
+    var borne = document.getElementById('borneFilter').value;
+    var url = API + (from ? '&from=' + from : '') + (to ? '&to=' + to : '') + (borne !== '0' ? '&borne=' + borne : '');
+    document.getElementById('content').innerHTML = '<div class="loading">Chargement...</div>';
+    fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+        // Populate borne filter
+        var sel = document.getElementById('borneFilter');
+        if (sel.options.length <= 1 && data.bornes) {
+            for (var id in data.bornes) {
+                var opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = data.bornes[id];
+                sel.appendChild(opt);
+            }
+        }
+        render(data);
+    }).catch(function(e) {
+        document.getElementById('content').innerHTML = '<div class="loading">Erreur de chargement</div>';
+    });
+}
+
+function render(data) {
+    var s = data.stats;
+    var rgpdNon = parseInt(s.total) - parseInt(s.rgpd_oui);
+    var html = '';
+
+    // Stats
+    html += '<div class="stats">';
+    html += statCard(s.total, 'Total entrees');
+    html += statCard(s.uniques, 'Contacts uniques');
+    html += statCard(s.sms, 'SMS');
+    html += statCard(s.emails, 'Emails');
+    html += statCard(s.rgpd_oui, 'RGPD Oui');
+    html += statCard(rgpdNon, 'RGPD Non');
+    html += statCard(s.jours, 'Jours actifs');
+    html += '</div>';
+
+    // Charts
+    html += '<div class="charts-row"><div class="chart-card"><h2>Evolution par semaine</h2><canvas id="weekChart" height="200"></canvas></div>';
+    html += '<div class="chart-card"><h2>Jour le plus actif</h2><canvas id="dayChart" height="200"></canvas></div></div>';
+
+    // Ranking
+    var sorted = data.bornes_stats.slice().sort(function(a, b) { return b.uniques - a.uniques; });
+    var maxR = sorted[0] ? sorted[0].uniques : 1;
+    html += '<div class="ranking"><h2>Classement des bornes</h2>';
+    sorted.forEach(function(b, i) {
+        html += '<div class="rank-row"><div class="rank-pos">' + (i + 1) + '</div><div class="rank-name">' + b.name + '</div><div style="flex:1;max-width:200px"><div class="rank-bar" style="width:' + Math.round(b.uniques / maxR * 100) + '%"></div></div><div class="rank-num">' + b.uniques + '</div></div>';
+    });
+    html += '</div>';
+
+    // Borne cards
+    html += '<h2 style="margin-bottom:12px">Detail par borne</h2>';
+    data.bornes_stats.forEach(function(b) {
+        var det = data.details[b.id] || [];
+        html += '<div class="borne-card"><div class="borne-header"><div><span class="borne-title">' + b.name + '</span> <span class="borne-id">ID #' + b.id + '</span></div>';
+        html += '<div class="borne-stats">';
+        html += borneStat(b.uniques, 'Contacts') + borneStat(b.sms, 'SMS') + borneStat(b.emails, 'Emails');
+        html += '</div><div class="borne-actions">';
+        if (det.length > 0) html += '<button class="btn btn-sm" style="background:#2563eb;border-color:#2563eb" onclick="toggleDetail(this)">Detail</button>';
+        html += '</div></div>';
+        if (det.length > 0) {
+            html += '<div class="borne-detail" style="display:none;margin-top:10px">';
+            html += '<input type="text" class="search-input" placeholder="Rechercher..." oninput="searchTable(this)">';
+            html += '<table><thead><tr><th>1ere visite</th><th>Type</th><th>Data</th><th>Passages</th><th>RGPD</th></tr></thead><tbody>';
+            det.forEach(function(row) {
+                var typeBadge = row.type === 2 ? '<span class="badge badge-sms">SMS</span>' : '<span class="badge badge-email">Email</span>';
+                var rgpdBadge = row.rgpd === 1 ? '<span class="badge badge-oui">Oui</span>' : '<span class="badge badge-non">Non</span>';
+                var passStyle = row.passages > 1 ? ' style="font-weight:700;color:#e94560"' : '';
+                html += '<tr><td>' + row.date + '</td><td>' + typeBadge + '</td><td>' + row.data + '</td><td' + passStyle + '>' + row.passages + '</td><td>' + rgpdBadge + '</td></tr>';
+            });
+            html += '</tbody></table></div>';
+        }
+        html += '</div>';
+    });
+
+    document.getElementById('content').innerHTML = html;
+
+    // Render charts
+    renderCharts(data);
+}
+
+function statCard(n, label) { return '<div class="stat-card"><div class="stat-num">' + (parseInt(n) || 0) + '</div><div class="stat-label">' + label + '</div></div>'; }
+function borneStat(n, label) { return '<div class="borne-stat"><div class="num">' + (parseInt(n) || 0) + '</div><div class="lbl">' + label + '</div></div>'; }
+function toggleDetail(btn) { var d = btn.closest('.borne-card').querySelector('.borne-detail'); d.style.display = d.style.display === 'none' ? '' : 'none'; }
+function searchTable(input) { var v = input.value.toLowerCase(); input.nextElementSibling.querySelectorAll('tbody tr').forEach(function(r) { r.style.display = r.textContent.toLowerCase().indexOf(v) >= 0 ? '' : 'none'; }); }
+
+function renderCharts(data) {
+    // Week chart
+    var weeks = {};
+    data.chart.forEach(function(c) { weeks[c.week] = true; });
+    var weekKeys = Object.keys(weeks).sort();
+    var weekLabels = weekKeys.map(function(yw) {
+        var y = parseInt(yw.substr(0, 4)), w = parseInt(yw.substr(4));
+        var d = new Date(y, 0, 1 + (w - 1) * 7);
+        return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+    });
+    var datasets = [];
+    var ci = 0;
+    data.bornes_stats.forEach(function(b) {
+        var d = {};
+        data.chart.forEach(function(c) { if (c.borne === b.id) d[c.week] = c.count; });
+        datasets.push({
+            label: b.name,
+            data: weekKeys.map(function(w) { return d[w] || 0; }),
+            borderColor: COLORS[ci % COLORS.length],
+            backgroundColor: COLORS[ci % COLORS.length] + '20',
+            tension: 0.3, borderWidth: 2, pointRadius: 2, fill: false
+        });
+        ci++;
+    });
+    if (weekChart) weekChart.destroy();
+    weekChart = new Chart(document.getElementById('weekChart'), {
+        type: 'line',
+        data: { labels: weekLabels, datasets: datasets },
+        options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }, scales: { y: { beginAtZero: true }, x: { ticks: { font: { size: 9 }, maxRotation: 45 } } } }
+    });
+
+    // Day chart
+    if (dayChart) dayChart.destroy();
+    dayChart = new Chart(document.getElementById('dayChart'), {
+        type: 'bar',
+        data: { labels: data.days.map(function(d) { return d.day; }), datasets: [{ data: data.days.map(function(d) { return d.count; }), backgroundColor: '#e9456080', borderColor: '#e94560', borderWidth: 1 }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true }, x: { ticks: { font: { size: 11 } } } } }
+    });
+}
+
+// Auto-login if remembered
+if (localStorage.getItem('plx_auth') === '1') showApp();
+</script>
+</body>
+</html>
