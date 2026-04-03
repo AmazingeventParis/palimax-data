@@ -154,10 +154,8 @@ function render(data) {
     html += statCard(s.total, 'Total entrées');
     html += statCard(s.uniques, 'Contacts uniques');
     html += statCard(s.sms, 'SMS');
-    html += statCard(s.emails, 'Emails');
     html += statCard(s.rgpd_oui, 'RGPD Oui');
     html += statCard(rgpdNon, 'RGPD Non');
-    html += statCard(s.jours, 'Jours actifs');
     html += '</div>';
 
     // Charts
@@ -173,7 +171,7 @@ function render(data) {
         var exTo = document.getElementById('dateTo').value;
         html += '<div class="borne-card" onclick="toggleDetailCard(this)"><div class="borne-header"><div><span class="borne-title">' + b.name + '</span> <span class="borne-id">ID #' + b.id + '</span></div>';
         html += '<div class="borne-stats">';
-        html += borneStat(b.uniques, 'Contacts') + borneStat(b.sms, 'SMS') + borneStat(b.emails, 'Emails');
+        html += borneStat(b.uniques, 'Contacts') + borneStat(b.sms, 'SMS');
         html += '</div><div class="borne-actions">';
         if (b.total > 0) {
             html += '<a class="btn btn-export btn-sm" href="' + API + (exFrom ? '&from=' + exFrom : '') + (exTo ? '&to=' + exTo : '') + '&borne=' + b.id + '&export=xlsx" target="_blank" onclick="event.stopPropagation()">Excel</a>';
